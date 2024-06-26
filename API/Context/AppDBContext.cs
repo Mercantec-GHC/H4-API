@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using API.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Context
 {
@@ -8,5 +9,6 @@ namespace API.Context
             : base(options)
         {
         }
+        public DbSet<User> Users { get; set; }
     }
 }
