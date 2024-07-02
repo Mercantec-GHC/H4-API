@@ -23,14 +23,27 @@ namespace API.Controllers
 
         // GET: api/ActivityLogs
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ActivityLog>>> GetActivityLogs()
+        public async Task<ActionResult<IEnumerable<ActivityLogDtO>>> GetActivityLogs()
         {
-            return await _context.ActivityLogs.ToListAsync();
+            var activityLogs = await _context.ActivityLogs.ToListAsync();
+            var activityLogDTOs = activityLogs.Select(activityLog => new ActivityLogDtO
+            {
+                Id = activityLog.Id,
+                Date = activityLog.Date,
+                Steps = activityLog.Steps,
+                Distance = activityLog.Distance,
+                StartTime = activityLog.StartTime,
+                EndTime = activityLog.EndTime,
+                Type = activityLog.Type,
+                UserId = activityLog.UserId
+            }).ToList();
+
+            return activityLogDTOs;
         }
 
         // GET: api/ActivityLogs/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ActivityLog>> GetActivityLog(string id)
+        public async Task<ActionResult<ActivityLogDtO>> GetActivityLog(string id)
         {
             var activityLog = await _context.ActivityLogs.FindAsync(id);
 
@@ -39,18 +52,42 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            return activityLog;
+            var activityLogDTOs = new ActivityLogDtO()
+            {
+                Id = activityLog.Id,
+                Date = activityLog.Date,
+                Steps = activityLog.Steps,
+                Distance = activityLog.Distance,
+                StartTime = activityLog.StartTime,
+                EndTime = activityLog.EndTime,
+                Type = activityLog.Type,
+                UserId = activityLog.UserId
+            };
+
+            return activityLogDTOs;
         }
 
         // PUT: api/ActivityLogs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutActivityLog(string id, ActivityLog activityLog)
+        public async Task<IActionResult> PutActivityLog(string id, ActivityLogDtO activityLogDTO)
         {
-            if (id != activityLog.Id)
+            if (id != activityLogDTO.Id)
             {
                 return BadRequest();
             }
+
+            var activityLog = new ActivityLog
+            {
+                Id = activityLogDTO.Id,
+                Date = activityLogDTO.Date,                 
+                Steps = activityLogDTO.Steps,
+                Distance = activityLogDTO.Distance,
+                StartTime = activityLogDTO.StartTime,
+                EndTime = activityLogDTO.EndTime,
+                Type = activityLogDTO.Type,
+                UserId = activityLogDTO.UserId
+            };
 
             _context.Entry(activityLog).State = EntityState.Modified;
 
@@ -76,8 +113,20 @@ namespace API.Controllers
         // POST: api/ActivityLogs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<ActivityLog>> PostActivityLog(ActivityLog activityLog)
+        public async Task<ActionResult<ActivityLogDtO>> PostActivityLog(ActivityLogDtO activityLogDTO)
         {
+            var activityLog = new ActivityLog
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Date = DateTime.UtcNow.AddHours(2),
+                Steps = activityLogDTO.Steps,
+                Distance = activityLogDTO.Distance,
+                StartTime = activityLogDTO.StartTime,
+                EndTime = activityLogDTO.EndTime,
+                Type = activityLogDTO.Type,
+                UserId = activityLogDTO.UserId
+            };
+
             _context.ActivityLogs.Add(activityLog);
             try
             {
@@ -95,8 +144,9 @@ namespace API.Controllers
                 }
             }
 
-            return CreatedAtAction("GetActivityLog", new { id = activityLog.Id }, activityLog);
+            return CreatedAtAction("GetActivityLog", new { id = activityLog.Id }, activityLogDTO);
         }
+
 
         // DELETE: api/ActivityLogs/5
         [HttpDelete("{id}")]
@@ -120,3 +170,4 @@ namespace API.Controllers
         }
     }
 }
+

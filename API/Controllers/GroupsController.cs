@@ -21,26 +21,51 @@ namespace API.Controllers
             _context = context;
         }
 
-        // GET: api/Groups
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Group>>> GetGroups()
+        public async Task<ActionResult<IEnumerable<GroupDtO>>> GetGroups()
         {
-            return await _context.Groups.ToListAsync();
+            
+            var groups = await _context.Groups
+                .Include(g => g.UserGroups) //Join on UserGroups
+                .ThenInclude(ug => ug.User) //Join on User from UserGroups ug
+                .ToListAsync();
+
+            var groupDTOs = groups.Select(g => new GroupDtO
+            {
+                Id = g.Id,
+                Name = g.Name,
+                Members = g.UserGroups.Select(ug => ug.User.Username).ToList() 
+            }).ToList();
+
+            return groupDTOs;
         }
+
 
         // GET: api/Groups/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Group>> GetGroup(string id)
+        public async Task<ActionResult<GroupDtO>> GetGroup(string id)
         {
-            var @group = await _context.Groups.FindAsync(id);
+            var group = await _context.Groups
+                .Include(g => g.UserGroups)
+                .ThenInclude(ug => ug.User)  
+                .SingleOrDefaultAsync(g => g.Id == id); 
 
-            if (@group == null)
+            if (group == null)
             {
                 return NotFound();
             }
 
-            return @group;
+            // Create a DTO from the Group
+            var groupDTO = new GroupDtO
+            {
+                Id = group.Id,
+                Name = group.Name,
+                Members = group.UserGroups.Select(ug => ug.User.Username).ToList()  
+            };
+
+            return groupDTO;
         }
+
 
         // PUT: api/Groups/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -76,16 +101,26 @@ namespace API.Controllers
         // POST: api/Groups
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Group>> PostGroup(Group @group)
+        public async Task<ActionResult<Group>> PostGroup(CreateGroupDtO createGroupDtO)
         {
-            _context.Groups.Add(@group);
+            // Create a new Group entity and map properties from DTO
+            var group = new Group
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Name = createGroupDtO.Name
+            };
+
+            // Add the new Group to the database context
+            _context.Groups.Add(group);
             try
             {
+                // Attempt to save changes in the database
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (GroupExists(@group.Id))
+                // Check if the Group already exists
+                if (GroupExists(group.Id))
                 {
                     return Conflict();
                 }
@@ -95,7 +130,9 @@ namespace API.Controllers
                 }
             }
 
-            return CreatedAtAction("GetGroup", new { id = @group.Id }, @group);
+
+            // Return the newly created GroupDTO with a CreatedAtAction to provide a location header
+            return CreatedAtAction("GetGroup", new { id = group.Id }, group);
         }
 
         // DELETE: api/Groups/5

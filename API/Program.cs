@@ -1,6 +1,7 @@
 
 using System.Text;
 using API.Context;
+using API.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -27,6 +28,7 @@ namespace API
                     }
                 );
             });
+            builder.Services.AddHttpClient();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -60,6 +62,12 @@ namespace API
                     ValidateIssuerSigningKey = true
                 };
             });
+            builder.Services.AddSingleton(new AppConfiguration
+            {
+                AccessKey = Configuration["AccessKey"] ?? Environment.GetEnvironmentVariable("AccessKey"),
+                SecretKey = Configuration["SecretKey"] ?? Environment.GetEnvironmentVariable("SecretKey")
+            });
+
 
             var app = builder.Build();
 

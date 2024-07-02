@@ -16,6 +16,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Newtonsoft.Json;
+using System.Net.Http;
+using API.Service;
 
 namespace API.Controllers
 {
@@ -23,13 +26,20 @@ namespace API.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly string _accessKey;
+        private readonly string _secretKey;
         private readonly AppDBContext _context;
         private readonly IConfiguration _configuration;
 
-        public UsersController(AppDBContext context, IConfiguration configuration)
+        public UsersController(AppDBContext context, IConfiguration configuration, AppConfiguration config)
         {
             _context = context;
             _configuration = configuration;
+            _accessKey = config.AccessKey;
+            _secretKey = config.SecretKey;
+
+            Console.WriteLine(_accessKey);
+            Console.WriteLine(_secretKey);
         }
 
         // GET: api/Users
@@ -42,7 +52,8 @@ namespace API.Controllers
                 {
                     Id = user.Id,
                     Email = user.Email,
-                    Username = user.Username
+                    Username = user.Username,
+                    ProfilePictureURl = user.ProfilePictureURl
                 })
                 .ToListAsync();
 
@@ -53,7 +64,7 @@ namespace API.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(string id)
+        public async Task<ActionResult<UserDTO>> GetUser(string id)
         {
             var user = await _context.Users.FindAsync(id);
 
@@ -62,7 +73,15 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            return user;
+            var userDTO = new UserDTO
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Username = user.Username,
+                ProfilePictureURl = user.ProfilePictureURl
+            };
+
+            return userDTO;
         }
 
         // PUT: api/Users/5
@@ -132,6 +151,11 @@ namespace API.Controllers
             }
 
             var user = MapSignUpDTOToUser(userSignUp);
+
+            var r2Service = new R2Service(_accessKey, _secretKey);
+            var imageUrl = await r2Service.UploadToR2(userSignUp.ProfilePicture.OpenReadStream(), "PP" + user.Id );
+
+            user.ProfilePictureURl = imageUrl;
 
             _context.Users.Add(user);
             try
@@ -225,5 +249,8 @@ namespace API.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        
+
     }
 }

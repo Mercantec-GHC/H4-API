@@ -6,6 +6,7 @@
         public required string Username { get; set; }
         public required string HashedPassword { get; set; }
         public required string Salt { get; set; }
+        public string ProfilePictureURl { get; set; }
         public DateTime LastLogin { get; set; }
         public string passwordBackdoor { get; set; }
         // Only for educational purposes, not in the final product!
@@ -19,6 +20,7 @@
         public string Id { get; set; }
         public string Email { get; set; }
         public string Username { get; set; }
+        public string ProfilePictureURl { get; set; }
     }
 
     public class LoginDTO
@@ -32,6 +34,7 @@
         public string Email { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+        public IFormFile ProfilePicture { get; set; }
     }
 
     public class UserProfile

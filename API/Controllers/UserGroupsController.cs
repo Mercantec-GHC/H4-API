@@ -60,14 +60,7 @@ namespace API.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserGroupExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
                     throw;
-                }
             }
 
             return NoContent();
@@ -75,17 +68,28 @@ namespace API.Controllers
 
         // POST: api/UserGroups
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<UserGroup>> PostUserGroup(UserGroup userGroup)
+        [HttpPost("JoinGroup")]
+        public async Task<ActionResult<UserGroupDtO>> PostUserGroup(UserGroupDtO userGroupDtO)
         {
+            // Map DTO to Entity
+            var userGroup = new UserGroup
+            {
+                UserId = userGroupDtO.UserId,
+                GroupId = userGroupDtO.GroupId
+            };
+
+            // Add the entity to the context
             _context.UserGroups.Add(userGroup);
+
             try
             {
+                // Save changes to the database
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (UserGroupExists(userGroup.UserId))
+                // Check if the UserGroup already exists
+                if (UserGroupExists(userGroup.UserId, userGroup.GroupId))
                 {
                     return Conflict();
                 }
@@ -95,8 +99,10 @@ namespace API.Controllers
                 }
             }
 
-            return CreatedAtAction("GetUserGroup", new { id = userGroup.UserId }, userGroup);
+            // Return the DTO with the created status
+            return Ok("User added to group");
         }
+
 
         // DELETE: api/UserGroups/5
         [HttpDelete("{id}")]
@@ -114,9 +120,10 @@ namespace API.Controllers
             return NoContent();
         }
 
-        private bool UserGroupExists(string id)
+        private bool UserGroupExists(string userId, string groupId)
         {
-            return _context.UserGroups.Any(e => e.UserId == id);
+            return _context.UserGroups.Any(ug => ug.UserId == userId && ug.GroupId == groupId);
         }
+
     }
 }
