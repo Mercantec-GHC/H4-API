@@ -29,7 +29,7 @@ namespace API.Controllers
         {
             if (_context.Database.CanConnect())
             {
-                return Ok("The database and Server is Live!");
+                return Ok("The database and server is Live!");
             }
             else return NotFound();
         }

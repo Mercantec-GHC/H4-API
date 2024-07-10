@@ -133,7 +133,7 @@ namespace API.Controllers
 
 
         [HttpPost("register")]
-        public async Task<IActionResult> PostUser(SignUpDTO userSignUp)
+        public async Task<IActionResult> PostUser([FromForm] SignUpDTO userSignUp)
         {
             if (await _context.Users.AnyAsync(u => u.Username == userSignUp.Username))
             {
