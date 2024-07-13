@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter/foundation.dart'; // Import for console output
+import 'package:flutter/foundation.dart';
 import 'package:flutter_api/models/login_model.dart';
 
 class AuthService {
@@ -19,6 +19,7 @@ class AuthService {
     if (response.statusCode == 200) {
       final token = jsonDecode(response.body)['token'];
       await storage.write(key: 'jwt', value: token);
+
       if (kDebugMode) {
         print('JWT Token: $token');
       }
@@ -29,5 +30,9 @@ class AuthService {
 
   Future<String?> getToken() async {
     return await storage.read(key: 'jwt');
+  }
+
+  Future<void> logout() async {
+    await storage.delete(key: 'jwt');
   }
 }

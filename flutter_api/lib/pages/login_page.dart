@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_api/service/auth_service.dart';
 import 'package:flutter_api/models/login_model.dart';
+import 'home_page.dart'; // Import HomePage
 
 class LoginPage extends StatefulWidget {
   @override
@@ -22,7 +23,11 @@ class _LoginPageState extends State<LoginPage> {
 
       try {
         await _authService.login(loginDTO);
-        // Naviger til næste side ved succes
+        // Navigate to HomePage on successful login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
       } catch (e) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Login failed')));
