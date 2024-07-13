@@ -79,6 +79,7 @@ namespace API
 
             app.UseAuthorization();
 
+            app.UseCors(MyAllowSpecificOrigins); 
 
             app.MapControllers();
 
