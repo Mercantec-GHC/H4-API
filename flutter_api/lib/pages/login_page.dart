@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_api/service/auth_service.dart';
 import 'package:flutter_api/models/login_model.dart';
-import 'home_page.dart'; // Import HomePage
+import 'home_page.dart';
+import 'register_page.dart'; // Importer RegisterPage
 
 class LoginPage extends StatefulWidget {
   @override
@@ -70,6 +71,15 @@ class _LoginPageState extends State<LoginPage> {
               ElevatedButton(
                 onPressed: _login,
                 child: Text('Login'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RegisterPage()),
+                  );
+                },
+                child: Text('Don\'t have an account? Register here'),
               ),
             ],
           ),

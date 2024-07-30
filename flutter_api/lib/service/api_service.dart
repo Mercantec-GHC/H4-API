@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'auth_service.dart';
+import 'package:flutter_api/config/api_config.dart';
 
 class ApiService {
   final AuthService _authService = AuthService();
-  final String baseUrl = 'https://h4-jwt.onrender.com';
+  final String baseUrl = ApiConfig.apiUrl;
 
   Future<List<dynamic>> getActivityLogs() async {
     final token = await _authService.getToken();

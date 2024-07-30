@@ -4,6 +4,7 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'login_page.dart';
+import 'package:flutter_api/config/api_config.dart';
 
 class UserProfilePage extends StatefulWidget {
   @override
@@ -50,7 +51,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   void _fetchUserData(String username) async {
     try {
       final response = await http.get(
-        Uri.parse('https://h4-jwt.onrender.com/api/Users/byusername/$username'),
+        Uri.parse('${ApiConfig.apiUrl}/api/Users/byusername/$username'),
         headers: {
           'Authorization': 'Bearer ${await _authService.getToken()}',
         },
@@ -79,11 +80,34 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Username: ${_userData!['username']}'),
-                  Text('Email: ${_userData!['email']}'),
                   if (_userData!['profilePictureURl'] != null)
-                    Image.network(_userData!['profilePictureURl']),
-                  // Tilføj flere felter efter behov
+                    Container(
+                      width: 150,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(_userData!['profilePictureURl']),
+                        ),
+                      ),
+                    ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Username: ${_userData!['username']}',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Email: ${_userData!['email']}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey[700],
+                    ),
+                  ),
                 ],
               )
             : CircularProgressIndicator(),

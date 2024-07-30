@@ -45,6 +45,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _logout() async {
+    await _authService.logout();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,6 +76,10 @@ class _HomePageState extends State<HomePage> {
                 MaterialPageRoute(builder: (context) => GroupsPage()),
               );
             },
+          ),
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            onPressed: _logout,
           ),
         ],
       ),

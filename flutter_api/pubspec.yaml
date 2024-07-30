@@ -13,8 +13,11 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.4
+  http_parser: ^4.0.0
   flutter_secure_storage: ^5.0.2
   dart_jsonwebtoken: ^2.14.0
+  shared_preferences: ^2.0.15
+  image_picker_web: ^4.0.0
   flutter_localizations:
     sdk: flutter
 

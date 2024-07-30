@@ -22,13 +22,9 @@ namespace API
                     name: MyAllowSpecificOrigins,
                     policy =>
                     {
-                        policy.WithOrigins(
-                                "http://localhost:60945", // Localhost for testing
-                                "https://h4apiflutter.netlify.app" // Netlify hosted frontend
-                            )
+                        policy.AllowAnyOrigin()
                             .AllowAnyMethod()
-                            .AllowAnyHeader()
-                            .AllowCredentials();
+                            .AllowAnyHeader();
                     }
                 );
             });
