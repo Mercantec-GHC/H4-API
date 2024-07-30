@@ -82089,7 +82089,7 @@ var $async$qW=A.Q(function(b,c){if(b===1){p=c
 s=q}while(true)switch(s){case 0:q=3
 l=t.N
 i=A
-h=A.fh("https://localhost:7105/api/Users/byusername/"+a)
+h=A.fh("https://h4-jwt.onrender.com/api/Users/byusername/"+a)
 g=A
 f="Authorization"
 e=A
@@ -82140,7 +82140,7 @@ return A.R(p.a.k7(),$async$qb)
 case 3:o=b
 n=t.N
 s=4
-return A.R(A.aoH(A.fh("https://localhost:7105/api/Groups"),A.aw(["Content-Type","application/json","Authorization","Bearer "+A.h(o)],n,n)),$async$qb)
+return A.R(A.aoH(A.fh("https://h4-jwt.onrender.com/api/Groups"),A.aw(["Content-Type","application/json","Authorization","Bearer "+A.h(o)],n,n)),$async$qb)
 case 4:m=b
 if(m.b===200){q=B.bl.t8(0,A.akN(A.ajW(m.e).c.a.h(0,"charset")).ec(0,m.w),null)
 s=1
@@ -82155,7 +82155,7 @@ return A.R(p.a.k7(),$async$qa)
 case 3:o=c
 n=t.N
 s=4
-return A.R(A.aoH(A.fh("https://localhost:7105/api/Groups/"+a),A.aw(["Content-Type","application/json","Authorization","Bearer "+A.h(o)],n,n)),$async$qa)
+return A.R(A.aoH(A.fh("https://h4-jwt.onrender.com/api/Groups/"+a),A.aw(["Content-Type","application/json","Authorization","Bearer "+A.h(o)],n,n)),$async$qa)
 case 4:m=c
 if(m.b===200){q=B.bl.t8(0,A.akN(A.ajW(m.e).c.a.h(0,"charset")).ec(0,m.w),null)
 s=1
@@ -82166,7 +82166,7 @@ A.la.prototype={
 u2(a){return this.aiQ(a)},
 aiQ(a){var s=0,r=A.P(t.H),q=this,p,o,n,m
 var $async$u2=A.Q(function(b,c){if(b===1)return A.M(c,r)
-while(true)switch(s){case 0:n=A.fh("https://localhost:7105/api/Users/login")
+while(true)switch(s){case 0:n=A.fh("https://h4-jwt.onrender.com/api/Users/login")
 m=t.N
 m=A.aw(["Content-Type","application/json"],m,m)
 s=2
