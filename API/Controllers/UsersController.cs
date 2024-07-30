@@ -43,7 +43,7 @@ namespace API.Controllers
         }
 
         // GET: api/Users
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
         {
@@ -83,6 +83,29 @@ namespace API.Controllers
 
             return userDTO;
         }
+
+        [HttpGet("byusername/{username}")]
+        public async Task<ActionResult<UserDTO>> GetUserByUsername(string username)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Username == username);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var userDTO = new UserDTO
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Username = user.Username,
+                ProfilePictureURl = user.ProfilePictureURl
+            };
+
+            return userDTO;
+        }
+
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

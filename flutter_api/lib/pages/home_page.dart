@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_api/service/auth_service.dart';
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'user_profile_page.dart';
+import 'groups_page.dart';
 import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,6 +12,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final AuthService _authService = AuthService();
+  String? _username;
 
   @override
   void initState() {
@@ -23,6 +27,21 @@ class _HomePageState extends State<HomePage> {
         context,
         MaterialPageRoute(builder: (context) => LoginPage()),
       );
+    } else {
+      _decodeToken(token);
+    }
+  }
+
+  void _decodeToken(String token) {
+    try {
+      final jwt = JWT.decode(token);
+      setState(() {
+        _username = jwt.payload[
+                'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']
+            as String?;
+      });
+    } catch (e) {
+      print('Fejl ved dekodning af JWT: $e');
     }
   }
 
@@ -31,9 +50,31 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.account_circle),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserProfilePage()),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.group),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => GroupsPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
-        child: Text('Welcome to the Home Page!'),
+        child: _username != null
+            ? Text('Welcome, $_username!')
+            : Text('Loading...'),
       ),
     );
   }

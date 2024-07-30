@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_api/service/auth_service.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
-import 'service/auth_service.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,7 +12,7 @@ class MyApp extends StatelessWidget {
 
   Future<Widget> _getInitialPage() async {
     String? token = await _authService.getToken();
-    if (token == null) {
+    if (token == null || token.isEmpty) {
       return LoginPage();
     } else {
       return HomePage();

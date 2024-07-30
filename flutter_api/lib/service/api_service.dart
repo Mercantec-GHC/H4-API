@@ -24,4 +24,42 @@ class ApiService {
       throw Exception('Failed to load activity logs');
     }
   }
+
+  Future<List<dynamic>> getGroups() async {
+    final token = await _authService.getToken();
+    final url = Uri.parse('$baseUrl/api/Groups');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to load groups');
+    }
+  }
+
+  Future<Map<String, dynamic>> getGroupById(String groupId) async {
+    final token = await _authService.getToken();
+    final url = Uri.parse('$baseUrl/api/Groups/$groupId');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to load group details');
+    }
+  }
 }
