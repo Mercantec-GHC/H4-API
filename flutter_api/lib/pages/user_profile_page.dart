@@ -50,7 +50,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   void _fetchUserData(String username) async {
     try {
       final response = await http.get(
-        Uri.parse('https://localhost:7105/api/Users/byusername/$username'),
+        Uri.parse('https://h4-jwt.onrender.com/api/Users/byusername/$username'),
         headers: {
           'Authorization': 'Bearer ${await _authService.getToken()}',
         },

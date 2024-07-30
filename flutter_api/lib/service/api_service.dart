@@ -4,7 +4,7 @@ import 'auth_service.dart';
 
 class ApiService {
   final AuthService _authService = AuthService();
-  final String baseUrl = 'https://localhost:7105';
+  final String baseUrl = 'https://h4-jwt.onrender.com';
 
   Future<List<dynamic>> getActivityLogs() async {
     final token = await _authService.getToken();

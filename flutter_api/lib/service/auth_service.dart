@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_api/models/login_model.dart';
 
 class AuthService {
-  final String baseUrl = 'https://localhost:7105';
+  final String baseUrl = 'https://h4-jwt.onrender.com';
   final storage = FlutterSecureStorage();
 
   Future<void> login(LoginDTO loginDTO) async {
