@@ -16,21 +16,25 @@ namespace API
             // Add services to the container.
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-            // Specify when frontend is created
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy(
                     name: MyAllowSpecificOrigins,
                     policy =>
                     {
-                        policy.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+                        policy.WithOrigins(
+                                "http://localhost:60945", // Localhost for testing
+                                "https://h4apiflutter.netlify.app" // Netlify hosted frontend
+                            )
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
                     }
                 );
             });
+
             builder.Services.AddHttpClient();
             builder.Services.AddControllers();
 
-            // Swagger/OpenAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
