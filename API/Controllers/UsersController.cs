@@ -260,20 +260,29 @@ namespace API.Controllers
                 new Claim(ClaimTypes.Name, user.Username)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
+            var jwtKey = _configuration["JwtSettings:Key"] ?? Environment.GetEnvironmentVariable("JWT_SETTINGS_KEY");
+            var jwtIssuer = _configuration["JwtSettings:Issuer"] ?? Environment.GetEnvironmentVariable("JWT_SETTINGS_ISSUER");
+            var jwtAudience = _configuration["JwtSettings:Audience"] ?? Environment.GetEnvironmentVariable("JWT_SETTINGS_AUDIENCE");
+
+            if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer) || string.IsNullOrEmpty(jwtAudience))
+            {
+                throw new InvalidOperationException("JWT settings are not configured properly.");
+            }
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                _configuration["JwtSettings:Issuer"],
-                _configuration["JwtSettings:Audience"],
-                claims,
+                issuer: jwtIssuer,
+                audience: jwtAudience,
+                claims: claims,
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        
+
 
     }
 }

@@ -53,6 +53,10 @@ namespace API
             var jwtIssuer = Configuration["JwtSettings:Issuer"] ?? Environment.GetEnvironmentVariable("JWT_SETTINGS_ISSUER");
             var jwtAudience = Configuration["JwtSettings:Audience"] ?? Environment.GetEnvironmentVariable("JWT_SETTINGS_AUDIENCE");
 
+            Console.WriteLine("JWT-Key" + jwtKey);
+            Console.WriteLine("JWT-Issuer" + jwtIssuer);
+            Console.WriteLine("JWT-Audience" + jwtAudience);
+
             // Check if critical JWT settings are missing
             if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer) || string.IsNullOrEmpty(jwtAudience))
             {
