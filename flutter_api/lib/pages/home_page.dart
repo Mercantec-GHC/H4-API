@@ -58,35 +58,72 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.account_circle),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => UserProfilePage()),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.group),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => GroupsPage()),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.exit_to_app),
-            onPressed: _logout,
-          ),
-        ],
       ),
       body: Center(
         child: _username != null
-            ? Text('Welcome, $_username!')
-            : Text('Loading...'),
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Welcome, $_username!'),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildCard(
+                        icon: Icons.account_circle,
+                        label: 'Profile',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => UserProfilePage()),
+                          );
+                        },
+                      ),
+                      _buildCard(
+                        icon: Icons.group,
+                        label: 'Groups',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => GroupsPage()),
+                          );
+                        },
+                      ),
+                      _buildCard(
+                        icon: Icons.exit_to_app,
+                        label: 'Logout',
+                        onTap: _logout,
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            : CircularProgressIndicator(),
+      ),
+    );
+  }
+
+  Widget _buildCard(
+      {required IconData icon,
+      required String label,
+      required VoidCallback onTap}) {
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 50),
+              SizedBox(height: 12),
+              Text(label, style: TextStyle(fontSize: 16)),
+            ],
+          ),
+        ),
       ),
     );
   }
