@@ -91,6 +91,7 @@ namespace API
 
             var app = builder.Build();
 
+            // Ensure the CORS middleware runs before the endpoint routing middleware
             app.UseCors(MyAllowSpecificOrigins);
 
             // Configure the HTTP request pipeline.
@@ -99,9 +100,8 @@ namespace API
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
-            
 
             app.MapControllers();
 
