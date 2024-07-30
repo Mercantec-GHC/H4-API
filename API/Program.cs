@@ -1,4 +1,3 @@
-
 using System.Text;
 using API.Context;
 using API.Service;
@@ -29,23 +28,32 @@ namespace API
                 );
             });
             builder.Services.AddHttpClient();
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            // Swagger/OpenAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             IConfiguration Configuration = builder.Configuration;
 
+            // Retrieve the connection string from configuration or environment variables
             string connectionString = Configuration.GetConnectionString("DefaultConnection")
-                                      ?? Environment.GetEnvironmentVariable("DefaultConnection");
+                                      ?? Environment.GetEnvironmentVariable("CONNECTION_STRINGS_DEFAULT_CONNECTION");
 
             builder.Services.AddDbContext<AppDBContext>(options =>
                 options.UseNpgsql(connectionString));
 
-            var jwtKey = Configuration["JwtSettings:Key"] ?? Environment.GetEnvironmentVariable("JwtSettings:Key");
-            var jwtIssuer = Configuration["JwtSettings:Issuer"] ?? Environment.GetEnvironmentVariable("JwtSettings:Issuer");
-            var jwtAudience = Configuration["JwtSettings:Audience"] ?? Environment.GetEnvironmentVariable("JwtSettings:Audience");
+            // Retrieve JWT settings from configuration or environment variables
+            var jwtKey = Configuration["JwtSettings:Key"] ?? Environment.GetEnvironmentVariable("JWT_SETTINGS_KEY");
+            var jwtIssuer = Configuration["JwtSettings:Issuer"] ?? Environment.GetEnvironmentVariable("JWT_SETTINGS_ISSUER");
+            var jwtAudience = Configuration["JwtSettings:Audience"] ?? Environment.GetEnvironmentVariable("JWT_SETTINGS_AUDIENCE");
+
+            // Check if critical JWT settings are missing
+            if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer) || string.IsNullOrEmpty(jwtAudience))
+            {
+                throw new InvalidOperationException("JWT settings are not configured properly.");
+            }
+
             // Configure JWT Authentication
             builder.Services.AddAuthentication(x =>
             {
@@ -65,12 +73,16 @@ namespace API
                     ValidateIssuerSigningKey = true
                 };
             });
+
+            // Retrieve custom settings from configuration or environment variables
+            var accessKey = Configuration["AccessKey"] ?? Environment.GetEnvironmentVariable("ACCESS_KEY");
+            var secretKey = Configuration["SecretKey"] ?? Environment.GetEnvironmentVariable("SECRET_KEY");
+
             builder.Services.AddSingleton(new AppConfiguration
             {
-                AccessKey = Configuration["AccessKey"] ?? Environment.GetEnvironmentVariable("AccessKey"),
-                SecretKey = Configuration["SecretKey"] ?? Environment.GetEnvironmentVariable("SecretKey")
+                AccessKey = accessKey,
+                SecretKey = secretKey
             });
-
 
             var app = builder.Build();
 
@@ -82,7 +94,7 @@ namespace API
 
             app.UseAuthorization();
 
-            app.UseCors(MyAllowSpecificOrigins); 
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.MapControllers();
 
