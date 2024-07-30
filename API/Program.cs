@@ -27,7 +27,8 @@ namespace API
                                 "https://h4apiflutter.netlify.app" // Netlify hosted frontend
                             )
                             .AllowAnyMethod()
-                            .AllowAnyHeader();
+                            .AllowAnyHeader()
+                            .AllowCredentials();
                     }
                 );
             });
@@ -90,6 +91,8 @@ namespace API
 
             var app = builder.Build();
 
+            app.UseCors(MyAllowSpecificOrigins);
+
             // Configure the HTTP request pipeline.
             app.UseSwagger();
             app.UseSwaggerUI();
@@ -98,7 +101,7 @@ namespace API
 
             app.UseAuthorization();
 
-            app.UseCors(MyAllowSpecificOrigins);
+            
 
             app.MapControllers();
 
