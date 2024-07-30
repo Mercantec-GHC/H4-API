@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using API.Context;
 using API.Service;
@@ -13,28 +14,23 @@ namespace API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            
-            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy(
-                    name: MyAllowSpecificOrigins,
-                    policy =>
-                    {
-                        policy.AllowAnyOrigin()
-                            .AllowAnyMethod()
-                            .AllowAnyHeader()
-                            .AllowCredentials();
-                    }
-                );
-            });
-
+            // Add services to the container.
             builder.Services.AddHttpClient();
             builder.Services.AddControllers();
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            // Add CORS services and define a global policy
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAnyOrigin", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
 
             IConfiguration Configuration = builder.Configuration;
 
@@ -50,9 +46,9 @@ namespace API
             var jwtIssuer = Configuration["JwtSettings:Issuer"] ?? Environment.GetEnvironmentVariable("JWT_SETTINGS_ISSUER");
             var jwtAudience = Configuration["JwtSettings:Audience"] ?? Environment.GetEnvironmentVariable("JWT_SETTINGS_AUDIENCE");
 
-            Console.WriteLine("JWT-Key" + jwtKey);
-            Console.WriteLine("JWT-Issuer" + jwtIssuer);
-            Console.WriteLine("JWT-Audience" + jwtAudience);
+            Console.WriteLine("JWT-Key: " + jwtKey);
+            Console.WriteLine("JWT-Issuer: " + jwtIssuer);
+            Console.WriteLine("JWT-Audience: " + jwtAudience);
 
             // Check if critical JWT settings are missing
             if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer) || string.IsNullOrEmpty(jwtAudience))
@@ -80,26 +76,16 @@ namespace API
                 };
             });
 
-            // Retrieve custom settings from configuration or environment variables
-            var accessKey = Configuration["AccessKey"] ?? Environment.GetEnvironmentVariable("ACCESS_KEY");
-            var secretKey = Configuration["SecretKey"] ?? Environment.GetEnvironmentVariable("SECRET_KEY");
-
-            builder.Services.AddSingleton(new AppConfiguration
-            {
-                AccessKey = accessKey,
-                SecretKey = secretKey
-            });
-
             var app = builder.Build();
-
-            // Ensure the CORS middleware runs before the endpoint routing middleware
-            app.UseCors(MyAllowSpecificOrigins);
 
             // Configure the HTTP request pipeline.
             app.UseSwagger();
             app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
+
+            // Apply CORS policy globally
+            app.UseCors("AllowAnyOrigin");
 
             app.UseAuthentication();
             app.UseAuthorization();
