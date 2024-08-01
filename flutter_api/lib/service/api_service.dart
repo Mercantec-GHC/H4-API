@@ -63,4 +63,93 @@ class ApiService {
       throw Exception('Failed to load group details');
     }
   }
+
+  Future<String?> getAuthToken() async {
+    return _authService.getToken();
+  }
+
+  Future<Map<String, dynamic>> getUserDataByUsername(String username) async {
+    String? token = await getAuthToken();
+    if (token == null) {
+      throw Exception('Authentication token is not available');
+    }
+
+    final response = await http.get(
+      Uri.parse('${ApiConfig.apiUrl}/api/Users/byusername/$username'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      print('Fejl ved hentning af brugerdata: ${response.statusCode}');
+      throw Exception('Failed to fetch user data');
+    }
+  }
+
+  Future<void> joinGroup(String userId, String groupId) async {
+    final token = await _authService.getToken();
+    final url = Uri.parse('$baseUrl/api/UserGroups/JoinGroup');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'userId': userId,
+        'groupId': groupId,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to join group');
+    }
+  }
+
+  Future<void> leaveGroup(String userId, String groupId) async {
+    final token = await _authService.getToken();
+    final url = Uri.parse('$baseUrl/api/UserGroups/LeaveGroup');
+
+    final response = await http.delete(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'userId': userId,
+        'groupId': groupId,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to leave group');
+    }
+  }
+
+  Future<Map<String, dynamic>> createGroup(String name) async {
+    final token = await _authService.getToken();
+    final url = Uri.parse('$baseUrl/api/Groups');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'name': name,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to create group');
+    }
+  }
 }

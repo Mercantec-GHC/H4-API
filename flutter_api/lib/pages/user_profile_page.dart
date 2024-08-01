@@ -1,72 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_api/service/auth_service.dart';
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'login_page.dart';
-import 'package:flutter_api/config/api_config.dart';
+import 'package:flutter_api/service/api_service.dart'; // Correct the import path as necessary
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart'; // Import to handle JWT
 
 class UserProfilePage extends StatefulWidget {
+  final String? username; // Can be null if "me" is meant to fetch current user
+
+  UserProfilePage({this.username});
+
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
-  final AuthService _authService = AuthService();
-  String? _username;
+  final ApiService _apiService = ApiService();
   Map<String, dynamic>? _userData;
 
   @override
   void initState() {
     super.initState();
-    _getUserProfile();
+    _fetchUserData();
   }
 
-  void _getUserProfile() async {
-    String? token = await _authService.getToken();
-    if (token == null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-      );
-    } else {
-      _decodeTokenAndFetchUserData(token);
-    }
-  }
-
-  void _decodeTokenAndFetchUserData(String token) async {
+  void _fetchUserData() async {
     try {
-      final jwt = JWT.decode(token);
-      _username = jwt.payload[
-              'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']
-          as String?;
-      if (_username != null) {
-        _fetchUserData(_username!);
+      if (widget.username == "me") {
+        String? token = await _apiService.getAuthToken();
+        if (token != null) {
+          final jwt = JWT.decode(token);
+          // Extracting username from the JWT custom claim
+          final currentUsername = jwt.payload[
+                  'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']
+              as String;
+          _fetchUserProfile(currentUsername);
+        } else {
+          throw Exception('No token found');
+        }
+      } else if (widget.username != null) {
+        // Fetch user data for a given username
+        _fetchUserProfile(widget.username!);
       }
     } catch (e) {
-      print('Fejl ved dekodning af JWT: $e');
+      print('Error fetching user data: $e');
     }
   }
 
-  void _fetchUserData(String username) async {
-    try {
-      final response = await http.get(
-        Uri.parse('${ApiConfig.apiUrl}/api/Users/byusername/$username'),
-        headers: {
-          'Authorization': 'Bearer ${await _authService.getToken()}',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        setState(() {
-          _userData = jsonDecode(response.body);
-        });
-      } else {
-        print('Fejl ved hentning af brugerdata: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Fejl: $e');
-    }
+  void _fetchUserProfile(String username) async {
+    final userData = await _apiService.getUserDataByUsername(username);
+    setState(() {
+      _userData = userData;
+    });
   }
 
   @override
@@ -76,8 +58,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
         title: Text('User Profile'),
       ),
       body: Center(
-        child: _userData != null
-            ? Column(
+        child: _userData == null
+            ? CircularProgressIndicator()
+            : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (_userData!['profilePictureURl'] != null)
@@ -109,8 +92,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                   ),
                 ],
-              )
-            : CircularProgressIndicator(),
+              ),
       ),
     );
   }

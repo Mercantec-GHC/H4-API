@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_api/service/auth_service.dart';
 import 'package:image_picker_web/image_picker_web.dart'; // Importer image_picker_web
-import 'dart:typed_data'; // For at håndtere binære data
+import 'dart:typed_data';
 import 'home_page.dart';
 
 class RegisterPage extends StatefulWidget {

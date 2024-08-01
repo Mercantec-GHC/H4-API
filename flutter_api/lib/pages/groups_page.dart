@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_api/service/api_service.dart';
-import 'group_detail_page.dart'; // Importér den nye side
+import 'group_detail_page.dart';
+import 'create_group_page.dart';
 
 class GroupsPage extends StatefulWidget {
   @override
@@ -25,6 +26,17 @@ class _GroupsPageState extends State<GroupsPage> {
       });
     } catch (e) {
       print('Fejl ved hentning af grupper: $e');
+    }
+  }
+
+  void _navigateToCreateGroup() async {
+    final newGroup = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CreateGroupPage()),
+    );
+
+    if (newGroup != null) {
+      _fetchGroups(); // Genindlæs grupperne for at inkludere den nye gruppe
     }
   }
 
@@ -83,6 +95,11 @@ class _GroupsPageState extends State<GroupsPage> {
                   },
                 ),
               ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _navigateToCreateGroup,
+        child: Icon(Icons.add),
+        tooltip: 'Create Group',
       ),
     );
   }

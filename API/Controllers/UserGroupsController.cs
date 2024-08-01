@@ -104,11 +104,13 @@ namespace API.Controllers
         }
 
 
-        // DELETE: api/UserGroups/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUserGroup(string id)
+        // DELETE: api/UserGroups/LeaveGroup
+        [HttpDelete("LeaveGroup")]
+        public async Task<IActionResult> LeaveGroup(UserGroupDtO userGroupDtO)
         {
-            var userGroup = await _context.UserGroups.FindAsync(id);
+            var userGroup = await _context.UserGroups
+                .FirstOrDefaultAsync(ug => ug.UserId == userGroupDtO.UserId && ug.GroupId == userGroupDtO.GroupId);
+
             if (userGroup == null)
             {
                 return NotFound();
@@ -117,8 +119,9 @@ namespace API.Controllers
             _context.UserGroups.Remove(userGroup);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok("User removed from group");
         }
+
 
         private bool UserGroupExists(string userId, string groupId)
         {
