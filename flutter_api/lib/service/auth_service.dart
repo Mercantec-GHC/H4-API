@@ -4,8 +4,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_api/models/login_model.dart';
 import 'package:flutter_api/config/api_config.dart';
-import 'dart:typed_data'; // For at håndtere binære data
-import 'package:http_parser/http_parser.dart'; // For at håndtere MediaType
+import 'dart:typed_data'; 
+import 'package:http_parser/http_parser.dart'; 
 
 class AuthService {
   final String baseUrl = ApiConfig.apiUrl;
@@ -46,7 +46,7 @@ class AuthService {
         profilePictureData,
         filename: fileName,
         contentType:
-            MediaType('image', 'jpeg'), // Juster content type hvis nødvendigt
+            MediaType('image', 'jpeg'), 
       ));
     }
 
