@@ -23,7 +23,7 @@ namespace API.Service
             var config = new AmazonS3Config
             {
                 ServiceURL = "https://7edebe7b5106f3bceb95ecd71d962f10.r2.cloudflarestorage.com",
-                ForcePathStyle = true // Ensure the path style is used
+                ForcePathStyle = true 
             };
             _s3Client = new AmazonS3Client(credentials, config);
         }

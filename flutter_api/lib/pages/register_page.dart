@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_api/service/auth_service.dart';
-import 'package:image_picker_web/image_picker_web.dart'; // Importer image_picker_web
+import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 import 'home_page.dart';
 
@@ -21,12 +21,13 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isLoading = false;
 
   Future<void> _pickImage() async {
-    final MediaInfo? mediaInfo = await ImagePickerWeb.getImageInfo();
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
-    if (mediaInfo != null) {
-      setState(() {
-        _selectedImageData = mediaInfo.data;
-        _fileName = mediaInfo.fileName;
+    if (image != null) {
+      setState(() async {
+        _selectedImageData = await image.readAsBytes();
+        _fileName = image.name;
       });
     }
   }

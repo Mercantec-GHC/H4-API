@@ -42,8 +42,8 @@
         public string Id { get; set; }
         public string FullName { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public double Height { get; set; } // in centimeters
-        public double Weight { get; set; } // in kilograms
+        public double Height { get; set; } 
+        public double Weight { get; set; } 
         public string UserId { get; set; }
         public User User { get; set; }
     }

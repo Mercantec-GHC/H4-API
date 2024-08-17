@@ -81,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              'Welcome Back!',
+                              'Velkommen',
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -149,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                                 );
                               },
                               child: Text(
-                                'Don\'t have an account? Register here',
+                                'Mangler du en konto? Opret en her',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Theme.of(context).primaryColor,
