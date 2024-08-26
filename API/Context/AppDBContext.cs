@@ -44,5 +44,6 @@ namespace API.Context
         public DbSet<ActivityLog> ActivityLogs { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<UserGroup> UserGroups { get; set; }
+        public DbSet<Pokedex> Pokedex { get; set; }
     }
 }
