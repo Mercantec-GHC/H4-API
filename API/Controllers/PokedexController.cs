@@ -1,10 +1,15 @@
-﻿using API.Context;
-using API.Service;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.IO;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using API.Context;
 using API.Models;
+using API.Service;
+using API.Models.API.Models;
 
 namespace API.Controllers
 {
@@ -15,72 +20,119 @@ namespace API.Controllers
         private readonly string _accessKey;
         private readonly string _secretKey;
         private readonly AppDBContext _context;
-        private readonly IConfiguration _configuration;
         private readonly R2Service _r2Service;
 
         public PokedexController(AppDBContext context, IConfiguration configuration, AppConfiguration config)
         {
             _context = context;
-            _configuration = configuration;
             _accessKey = config.AccessKey;
             _secretKey = config.SecretKey;
+
             _r2Service = new R2Service(_accessKey, _secretKey);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetPokedexEntry(int id)
+        // GET: api/Pokedex
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Pokedex>>> GetPokedexEntries()
         {
-            var entry = await _context.Pokedex.FindAsync(id);
+            var pokedexEntries = await _context.Pokedex
+                .ToListAsync();
 
-            if (entry == null)
+            return Ok(pokedexEntries);
+        }
+
+        // GET: api/Pokedex/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Pokedex>> GetPokedexEntry(int id)
+        {
+            var pokedexEntry = await _context.Pokedex.FindAsync(id);
+
+            if (pokedexEntry == null)
             {
                 return NotFound();
             }
 
-            return Ok(entry);
+            return Ok(pokedexEntry);
         }
 
+        // POST: api/Pokedex
         [HttpPost]
-        public async Task<IActionResult> PostPokedexEntry([FromForm] IFormFile file, [FromForm] string name, [FromForm] string type, [FromForm] string art, [FromForm] int? hp, [FromForm] int? attack, [FromForm] int? defense, [FromForm] int? speed, [FromForm] int? weight, [FromForm] int? height, [FromForm] string description)
+        public async Task<IActionResult> PostPokedexEntry([FromForm] PokedexDTO pokedexDTO)
         {
-            if (file == null || file.Length == 0)
+            string imageUrl = null;
+            if (pokedexDTO.ProfilePicture != null && pokedexDTO.ProfilePicture.Length > 0)
             {
-                return BadRequest("No file uploaded.");
-            }
 
-            string imageUrl;
-            try
-            {
-                using (var fileStream = file.OpenReadStream())
+                try
                 {
-                    var fileName = Path.GetFileName(file.FileName);
-                    imageUrl = await _r2Service.UploadToR2(fileStream, fileName);
+                    using (var fileStream = pokedexDTO.ProfilePicture.OpenReadStream())
+                    {
+                        var fileName = Path.GetFileName(pokedexDTO.ProfilePicture.FileName);
+                        imageUrl = await _r2Service.UploadToR2(fileStream, fileName);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error uploading file: {ex.Message}");
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, $"Error uploading file: {ex.Message}");
+                }
+
             }
 
             var pokedexEntry = new Pokedex
             {
-                Name = name,
-                Type = type,
-                Art = art,
-                Hp = hp,
-                Attack = attack,
-                Defense = defense,
-                Speed = speed,
-                Weight = weight,
-                Height = height,
-                Description = description,
+                Id = Guid.NewGuid().ToString("N"),
+                Name = pokedexDTO.Name,
+                Type = pokedexDTO.Type,
+                Art = pokedexDTO.Art,
+                Hp = pokedexDTO.Hp,
+                Attack = pokedexDTO.Attack,
+                Defense = pokedexDTO.Defense,
+                Speed = pokedexDTO.Speed,
+                Weight = pokedexDTO.Weight,
+                Height = pokedexDTO.Height,
+                Description = pokedexDTO.Description,
                 ImageUrl = imageUrl
             };
 
             _context.Pokedex.Add(pokedexEntry);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (PokedexEntryExists(pokedexEntry.Id))
+                {
+                    return Conflict();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
             return CreatedAtAction(nameof(GetPokedexEntry), new { id = pokedexEntry.Id }, pokedexEntry);
+        }
+
+        // DELETE: api/Pokedex/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePokedexEntry(int id)
+        {
+            var pokedexEntry = await _context.Pokedex.FindAsync(id);
+            if (pokedexEntry == null)
+            {
+                return NotFound();
+            }
+
+            _context.Pokedex.Remove(pokedexEntry);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool PokedexEntryExists(string id)
+        {
+            return _context.Pokedex.Any(e => e.Id == id);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using API.Models;
+using API.Models.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Context

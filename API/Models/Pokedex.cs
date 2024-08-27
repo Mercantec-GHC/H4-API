@@ -3,32 +3,38 @@ using System.ComponentModel.DataAnnotations;
 
 namespace API.Models
 {
-    public class Pokedex
+    namespace API.Models
     {
-        [Key]
-        public string Id { get; set; }
+        public class Pokedex
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
+            public string Type { get; set; }
+            public string Art { get; set; }
+            public int? Hp { get; set; }
+            public int? Attack { get; set; }
+            public int? Defense { get; set; }
+            public int? Speed { get; set; }
+            public int? Weight { get; set; }
+            public int? Height { get; set; }
+            public string Description { get; set; }
+            public string ImageUrl { get; set; }
+        }
 
-        [Required]
-        [StringLength(100)]
-        public string Name { get; set; }
-
-        [StringLength(50)]
-        public string? Type { get; set; }
-
-        [StringLength(50)]
-        public string? Art { get; set; }
-
-        public int? Hp { get; set; }
-        public int? Attack { get; set; }
-        public int? Defense { get; set; }
-        public int? Speed { get; set; }
-        public int? Weight { get; set; }
-        public int? Height { get; set; }
-
-        [Column(TypeName = "text")]
-        public string? Description { get; set; }
-
-        [StringLength(255)]
-        public string? ImageUrl { get; set; }
+        public class PokedexDTO
+        {
+            public string Name { get; set; }
+            public string Type { get; set; }
+            public string Art { get; set; }
+            public int? Hp { get; set; }
+            public int? Attack { get; set; }
+            public int? Defense { get; set; }
+            public int? Speed { get; set; }
+            public int? Weight { get; set; }
+            public int? Height { get; set; }
+            public string Description { get; set; }
+            public IFormFile ProfilePicture { get; set; }
+        }
     }
+
 }
