@@ -14,7 +14,7 @@ namespace API.Migrations
                 name: "Pokedex",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<string>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     Art = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),

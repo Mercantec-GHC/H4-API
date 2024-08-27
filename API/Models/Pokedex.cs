@@ -7,7 +7,7 @@ namespace API.Models
     {
         public class Pokedex
         {
-            public string Id { get; set; }
+            public int Id { get; set; }
             public string Name { get; set; }
             public string Type { get; set; }
             public string Art { get; set; }
