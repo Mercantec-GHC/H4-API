@@ -68,7 +68,7 @@ namespace API.Controllers
                     using (var fileStream = pokedexDTO.ProfilePicture.OpenReadStream())
                     {
                         var fileName = Path.GetFileName(pokedexDTO.ProfilePicture.FileName);
-                        imageUrl = await _r2Service.UploadToR2(fileStream, pokedexDTO.Name);
+                        imageUrl = await _r2Service.UploadToR2(fileStream, fileName);
                     }
                 }
                 catch (Exception ex)
@@ -80,6 +80,7 @@ namespace API.Controllers
 
             var pokedexEntry = new Pokedex
             {
+                Id = Guid.NewGuid().ToString("N"),
                 Name = pokedexDTO.Name,
                 Type = pokedexDTO.Type,
                 Art = pokedexDTO.Art,
@@ -100,8 +101,14 @@ namespace API.Controllers
             }
             catch (DbUpdateException)
             {
-
+                if (PokedexEntryExists(pokedexEntry.Id))
+                {
+                    return Conflict();
+                }
+                else
+                {
                     throw;
+                }
             }
 
             return CreatedAtAction(nameof(GetPokedexEntry), new { id = pokedexEntry.Id }, pokedexEntry);
@@ -123,7 +130,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        private bool PokedexEntryExists(int id)
+        private bool PokedexEntryExists(string id)
         {
             return _context.Pokedex.Any(e => e.Id == id);
         }
