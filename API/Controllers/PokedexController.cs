@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Amazon.S3.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -59,6 +60,7 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> PostPokedexEntry([FromForm] PokedexDTO pokedexDTO)
         {
+            var Id = Guid.NewGuid().ToString("N");
             string imageUrl = null;
             if (pokedexDTO.ProfilePicture != null && pokedexDTO.ProfilePicture.Length > 0)
             {
@@ -67,8 +69,7 @@ namespace API.Controllers
                 {
                     using (var fileStream = pokedexDTO.ProfilePicture.OpenReadStream())
                     {
-                        var fileName = Path.GetFileName(pokedexDTO.ProfilePicture.FileName);
-                        imageUrl = await _r2Service.UploadToR2(fileStream, fileName);
+                        imageUrl = await _r2Service.UploadToR2(fileStream, Id);
                     }
                 }
                 catch (Exception ex)
@@ -80,7 +81,7 @@ namespace API.Controllers
 
             var pokedexEntry = new Pokedex
             {
-                Id = Guid.NewGuid().ToString("N"),
+                Id = Id,
                 Name = pokedexDTO.Name,
                 Type = pokedexDTO.Type,
                 Art = pokedexDTO.Art,
